@@ -3,6 +3,8 @@ package com.example.be4.restaurant.domain;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,5 +47,8 @@ public class RestaurantPostEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "restaurant_info_id")
     public RestaurantInfoEntity infoEntity;
+
+    @OneToMany(mappedBy = "postEntity")
+    private List<RestaurantCommentEntity> comments;
 
 }

@@ -1,9 +1,12 @@
 package com.example.be4.restaurant.service;
 
+import com.example.be4.restaurant.domain.RestaurantCommentEntity;
 import com.example.be4.restaurant.dto.*;
+import com.example.be4.restaurant.exception.CommentNotFoundException;
 import com.example.be4.restaurant.exception.InvalidPasswordException;
 import com.example.be4.restaurant.exception.KeyWordNotInsertException;
 import com.example.be4.restaurant.exception.PostNotFoundException;
+import com.example.be4.restaurant.repository.RestaurantCommentRepository;
 import com.example.be4.restaurant.repository.RestaurantInfoRepository;
 import com.example.be4.restaurant.repository.RestaurantPostRepository;
 import com.example.be4.restaurant.domain.RestaurantInfoEntity;
@@ -25,6 +28,7 @@ public class RestaurantService {
     private final CustomMapper mapper;
     private final RestaurantInfoRepository infoRepository;
     private final RestaurantPostRepository postRepository;
+    private final RestaurantCommentRepository commentRepository;
 
 
     /* 식당 게시글 생성 (restaurant_info, restaurant_post 테이블 저장) */
@@ -133,5 +137,53 @@ public class RestaurantService {
         else{
             return true;
         }
+    }
+
+    /* 모든 댓글 조회 */
+    @Transactional(readOnly = true)
+    public List<RestaurantCommentResponseDto> getComments(Long postId) {
+        RestaurantPostEntity postEntity = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다. ID: " + postId));
+        List<RestaurantCommentEntity> result = commentRepository.findAllByPostEntity(postEntity);
+        return RestaurantCommentResponseDto.of(result);
+    }
+
+    /* 댓글 수정 */
+    @Transactional
+    public RestaurantCommentResponseDto updateComment(Long postId, Long commentId, RestaurantCommentRequestDto restaurantCommentDto) {
+        RestaurantPostEntity postEntity = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다. ID: " + postId));
+        RestaurantCommentEntity comment = commentRepository.findByIdAndPostEntity(commentId, postEntity);
+        if (comment == null) {
+            throw new CommentNotFoundException("댓글을 찾을 수 없습니다. ID: " + commentId);
+        }
+
+        // 비밀번호 검증
+        checkPassword(comment.getPassword(), restaurantCommentDto.getPassword());
+
+        comment.setContent(restaurantCommentDto.getContent());
+        comment.setPassword(restaurantCommentDto.getPassword());
+        return RestaurantCommentResponseDto.of(comment);
+    }
+
+    /* 댓글 생성 */
+    @Transactional
+    public RestaurantCommentResponseDto createComment(Long postId, RestaurantCommentRequestDto commentRequestDto) {
+        RestaurantPostEntity postEntity = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다. ID: " + postId));
+        RestaurantCommentEntity commentEntity = commentRepository.save(RestaurantCommentEntity.of(postEntity, commentRequestDto));
+        return RestaurantCommentResponseDto.of(commentEntity);
+    }
+
+    /* 댓글 삭제 */
+    @Transactional
+    public void deleteComment(Long commentId, RestaurantDeleteDto deleteDto) {
+        RestaurantCommentEntity comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("댓글을 찾을 수 없습니다. ID: " + commentId));
+
+        // 비밀번호 검증
+        checkPassword(comment.getPassword(), deleteDto.getPassword());
+
+        commentRepository.delete(comment);
     }
 }
