@@ -21,6 +21,7 @@ public interface CustomMapper {
     //RestaurantResponseDto -> RestaurantPostEntity (역변환)
     @InheritInverseConfiguration(name = "postToResponse")
     @Mapping(target = "infoEntity", ignore = true)
+    @Mapping(target = "password", ignore = true)
     RestaurantPostEntity responseToPost(RestaurantResponseDto responseDto);
 
     // RestaurantRequestDto -> RestaurantPostEntity
@@ -42,6 +43,9 @@ public interface CustomMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "category", ignore = true)
+    @Mapping(target = "tasteRating", ignore = true)
+    @Mapping(target = "speedRating", ignore = true)
+    @Mapping(target = "priceRating", ignore = true)
     RestaurantResponseDto infoToResponse(RestaurantInfoEntity infoEntity);
 
     // RestaurantPostEntity -> RestaurantListResponseDto
@@ -56,5 +60,8 @@ public interface CustomMapper {
 
     //updatedto -> postEntity
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "infoEntity", ignore = true)
     void updateFromDto(RestaurantUpdateDto updateDto, @MappingTarget RestaurantPostEntity entity);
 }
