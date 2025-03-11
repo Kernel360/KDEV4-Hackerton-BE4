@@ -1,8 +1,7 @@
-package com.example.be4.domain;
+package com.example.be4.restaurant.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 
 import java.time.LocalDateTime;
 
