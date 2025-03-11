@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>회의실 예약 시스템</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .container {
+        margin-top: 30px;
+      }
+      .room-layout {
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        gap: 20px;
+      }
+      .room-list {
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+      .room-grid {
+        display: grid;
+        grid-template-areas:
+          "a b"
+          "c d";
+        gap: 20px;
+      }
+      .room-box {
+        aspect-ratio: 1;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .room-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .room-box.reserved {
+        background-color: #e9ecef;
+        color: #6c757d;
+      }
+      .room-box.available {
+        background-color: white;
+        color: #212529;
+      }
+      .room-box span {
+        font-size: 14px;
+        margin-top: 8px;
+        color: #6c757d;
+      }
+      .reservation-list {
+        margin-top: 20px;
+      }
+      .nav-tabs {
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="rooms-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#rooms"
+            type="button"
+            role="tab"
+          >
+            회의실 목록
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="reservations-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#reservations"
+            type="button"
+            role="tab"
+          >
+            예약 현황
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="myTabContent">
+        <!-- 회의실 목록 탭 -->
+        <div class="tab-pane fade show active" id="rooms" role="tabpanel">
+          <h2 class="mb-4">회의실 예약</h2>
+          <div class="room-layout">
+            <div class="room-list" id="roomList">
+              <!-- 회의실 예약 버튼들이 여기에 동적으로 추가됩니다 -->
+            </div>
+            <div class="room-grid">
+              <div class="room-box" data-room="A">
+                A
+                <span>상태 확인 중...</span>
+              </div>
+              <div class="room-box" data-room="B">
+                B
+                <span>상태 확인 중...</span>
+              </div>
+              <div class="room-box" data-room="C">
+                C
+                <span>상태 확인 중...</span>
+              </div>
+              <div class="room-box" data-room="D">
+                D
+                <span>상태 확인 중...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 예약 현황 탭 -->
+        <div class="tab-pane fade" id="reservations" role="tabpanel">
+          <h2 class="mb-4">예약 현황</h2>
+          <div id="reservationList">
+            <!-- 예약 목록이 여기에 동적으로 추가됩니다 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 예약 모달 -->
+      <div class="modal fade" id="reservationModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">회의실 예약</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="reservationForm">
+                <input type="hidden" id="roomId" />
+                <input type="hidden" id="reservationId" />
+                <div class="mb-3">
+                  <label class="form-label">팀 선택</label>
+                  <select class="form-select" id="teamId" required>
+                    <!-- 팀 목록이 동적으로 추가됩니다 -->
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">예약 날짜</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="reservationDate"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">시작 시간</label>
+                  <select class="form-select" id="startTime" required>
+                    <option value="">시작 시간 선택</option>
+                    <option value="09:00">09:00</option>
+                    <option value="10:00">10:00</option>
+                    <option value="11:00">11:00</option>
+                    <option value="12:00">12:00</option>
+                    <option value="13:00">13:00</option>
+                    <option value="14:00">14:00</option>
+                    <option value="15:00">15:00</option>
+                    <option value="16:00">16:00</option>
+                    <option value="17:00">17:00</option>
+                    <option value="18:00">18:00</option>
+                    <option value="19:00">19:00</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">종료 시간</label>
+                  <select class="form-select" id="endTime" required>
+                    <option value="">종료 시간 선택</option>
+                    <option value="10:00">10:00</option>
+                    <option value="11:00">11:00</option>
+                    <option value="12:00">12:00</option>
+                    <option value="13:00">13:00</option>
+                    <option value="14:00">14:00</option>
+                    <option value="15:00">15:00</option>
+                    <option value="16:00">16:00</option>
+                    <option value="17:00">17:00</option>
+                    <option value="18:00">18:00</option>
+                    <option value="19:00">19:00</option>
+                    <option value="20:00">20:00</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">비밀번호</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    required
+                  />
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="makeReservation()"
+              >
+                예약
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <script src="/js/main.js"></script>
+  </body>
+</html>
