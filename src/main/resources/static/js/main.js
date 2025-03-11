@@ -1,3 +1,4 @@
+const API_BASE_URL = 'http://localhost:8080';
 
 // 날짜 포맷팅 함수
 function formatDate(date) {
