@@ -1,3 +1,5 @@
+// API 엔드포인트 기본 URL
+const API_BASE_URL = "http://localhost:8083";
 
 // 날짜 포맷팅 함수
 function formatDate(date) {
