@@ -1,5 +1,6 @@
 package com.example.be4.global.exception;
 
+import com.example.be4.restaurant.exception.CommentNotFoundException;
 import com.example.be4.restaurant.exception.InvalidPasswordException;
 import com.example.be4.restaurant.exception.KeyWordNotInsertException;
 import com.example.be4.restaurant.exception.PostNotFoundException;
@@ -16,6 +17,11 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(PostNotFoundException.class)
     public ResponseEntity<String> handlePostNotFoundException(PostNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<String> handleCommentNotFoundException(CommentNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 

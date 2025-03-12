@@ -56,4 +56,35 @@ public class RestaurantApi {
         List<RestaurantListResponseDto> listDto = restaurantService.getListByKeyword(keyword);
         return ResponseEntity.ok(listDto);
     }
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<List<RestaurantCommentResponseDto>> getComments(@PathVariable("id") Long postId) {
+        return ResponseEntity.ok().body(restaurantService.getComments(postId));
+    }
+
+    @PutMapping("/{postId}/comment/{commentId}")
+    public ResponseEntity<RestaurantCommentResponseDto> updateComment(
+            @PathVariable("postId") Long postId,
+            @PathVariable("commentId") Long commentId,
+            @RequestBody RestaurantCommentRequestDto restaurantCommentDto
+    ) {
+        return ResponseEntity.ok().body(restaurantService.updateComment(postId, commentId, restaurantCommentDto));
+    }
+
+    @PostMapping("/{postId}/comment")
+    public ResponseEntity<RestaurantCommentResponseDto> createComment(
+            @PathVariable("postId") long postId,
+            @RequestBody RestaurantCommentRequestDto restaurantCommentDto
+    ) {
+        return ResponseEntity.ok().body(restaurantService.createComment(postId, restaurantCommentDto));
+    }
+
+    @DeleteMapping("/comment/{id}")
+    public ResponseEntity<Object> deleteComment(
+            @PathVariable("id") Long commentId,
+            @RequestBody RestaurantDeleteDto deleteDto
+    ) {
+        restaurantService.deleteComment(commentId, deleteDto);
+        return ResponseEntity.ok().build();
+    }
 }
